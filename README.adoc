@@ -5,3 +5,33 @@ This project is based on the repo from mcauser: https://github.com/mcauser/micro
 It mainly focuses on the Waveshare 2.9inch Black/white/Red Paper display over an SPI bus. It fixes some issues from the original repo and mainly splits the E-Paper display part and the Framebuffer goodies.
 
 Although it should work with an ESP8266, my initial tests showed issues due to the limited amount of memory. Most of my tests are based on the ESP32.
+
+== Usage
+
+I recommend using ampy: https://github.com/adafruit/ampy
+
+I also usually create an alias with port and baudrate that I call `mpt`:
+
+	echo "alias mpt='ampy -p /dev/cu.SLAB_USBtoUART -b 115200'" >> ~/.bash_profile
+	source ~/.bash_profile
+
+First you need to bring the modules to your ESP32:
+
+	mpt put fbdrawing.py
+	mpt put waveshare2in9b.py
+
+This will copy the files on your microcontroller. You can check:
+
+	mpt ls
+
+	$ mpt ls
+	waveshare2in9b.py
+	fbdrawing.py
+
+If something goes wrong, check your port and baudrate. You may also try to reboot your board. That helps in some cases.
+
+Now using `minicom` or your tool of choice, you may copy/paste (CTRL+E with minicom to switch to paste mode, then CTRL+V to paste and CTRL+D to exit paste mode) one of the samples. Once the sample is loaded, run one of the tests:
+
+	test1()
+
+You can now observe your display.
