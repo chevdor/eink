@@ -35,3 +35,6 @@ Now using `minicom` or your tool of choice, you may copy/paste (CTRL+E with mini
 	test1()
 
 You can now observe your display.
+
+include::doc/ws2in9b.adoc[]
+
