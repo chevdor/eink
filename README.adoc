@@ -1,10 +1,17 @@
 = E-INK for micropython
 
-This project is based on the repo from mcauser: https://github.com/mcauser/micropython-waveshare-epaper
+== Intro
 
-It mainly focuses on the Waveshare 2.9inch Black/white/Red Paper display over an SPI bus. It fixes some issues from the original repo and mainly splits the E-Paper display part and the Framebuffer goodies.
+
+This repo mainly focuses on the Waveshare 2.9inch Black/white/Red Paper display over an SPI bus. It fixes some issues from the original repo and mainly splits the E-Paper display part and the Framebuffer goodies.
 
 Although it should work with an ESP8266, my initial tests showed issues due to the limited amount of memory. Most of my tests are based on the ESP32.
+
+== Acknowledge
+
+Many thanks to the authors of the following:
+- https://github.com/mcauser/micropython-waveshare-epaper
+- https://github.com/adafruit/micropython-adafruit-bitmap-font/releases
 
 == Usage
 

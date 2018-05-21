@@ -103,9 +103,7 @@ class EPD:
         sleep_ms(100)
 
     def display_frame(self, frame_buffer_black, frame_buffer_red):
-        print("display_frame")
-        print("w", self.width)
-        print("h", self.height)
+        print("display_frame", self.width, self.height)
         if (frame_buffer_black != None):
             self._command(DATA_START_TRANSMISSION_1)
             sleep_ms(2)

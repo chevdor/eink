@@ -1,12 +1,12 @@
 from micropython import const
 import framebuf
 
-ROTATE_0   = const(0) # 'portrait', connector up
-ROTATE_90  = const(1)
-ROTATE_180 = const(2)
-ROTATE_270 = const(3)
-
 class FrameBufferExtended(framebuf.FrameBuffer):
+	ROTATE_0   = const(0) # 'portrait', connector up
+	ROTATE_90  = const(1)
+	ROTATE_180 = const(2)
+	ROTATE_270 = const(3)
+
 	def __init__(self, buf, w, h, enc):
 		self._buffer = buf
 		self._width = w # 'physical' width
@@ -23,15 +23,17 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 
 	def get_absolute_pixel(self, x, y):
 		if (x < 0 or x >= self._width or y < 0 or y >= self._height):
-			raise ValueError('Invalid coordinate')
+			return
 		
 		return self._buffer[(x + y * self._width) // 8]
 		
-	def set_absolute_pixel(self, x, y, value):
+	def set_absolute_pixel(self, x, y, colored):
+		print("set_absolute_pixel", x, y, colored)
+		# print(" A: w x h: ", self._width , self._height )
 		if (x < 0 or x >= self._width or y < 0 or y >= self._height):
-			raise ValueError('Invalid coordinate')
-
-		if (value):
+			print("A: skipped", x, y)
+			return
+		if (colored):
 			self._buffer[(x + y * self._width) // 8] &= ~(0x80 >> (x % 8))
 		else:
 			self._buffer[(x + y * self._width) // 8] |= 0x80 >> (x % 8)
@@ -42,39 +44,26 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 		if (self._rotate == ROTATE_0):
 			return self.get_absolute_pixel(x, y)
 		elif (self._rotate == ROTATE_90):
-			point_temp = x
-			x = self._width - y
-			y = point_temp
-			return self.get_absolute_pixel(x, y)
+			return self.get_absolute_pixel(self.height -y -1, x)
 		elif (self._rotate == ROTATE_180):
-			x = self._width - x
-			y = self._height - y
-			return self.get_absolute_pixel(x, y)
+			return self.get_absolute_pixel(self.width -1 - x, self.height -1 - y)
 		elif (self._rotate == ROTATE_270):
-			point_temp = x
-			x = y
-			y = self._height  - point_temp
-			return self.get_absolute_pixel(x, y)
+			return self.get_absolute_pixel(y, self.width -1 - x)
 
 	def set_pixel(self, x, y, colored):
+		print("set_pixel", x, y, colored)
+		# print(" R: w x h:", self.width, self.height )
 		if (x < 0 or x >= self.width or y < 0 or y >= self.height):
+			print("R: skipped", x, y)
 			return
 		if (self._rotate == ROTATE_0):
 			self.set_absolute_pixel(x, y, colored)
 		elif (self._rotate == ROTATE_90):
-			point_temp = x
-			x = self._width - y
-			y = point_temp
-			self.set_absolute_pixel(x, y, colored)
+			self.set_absolute_pixel(self.height -y -1, x, colored)
 		elif (self._rotate == ROTATE_180):
-			x = self._width - x
-			y = self._height - y
-			self.set_absolute_pixel(x, y, colored)
+			self.set_absolute_pixel(self.width -1 - x, self.height -1 - y, colored)
 		elif (self._rotate == ROTATE_270):
-			point_temp = x
-			x = y
-			y = self._height  - point_temp
-			self.set_absolute_pixel(x, y, colored)
+			self.set_absolute_pixel(y, self.width -1 - x, colored)
 
 	def get_rotate(self):
 		return self._rotate
@@ -98,6 +87,7 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 			self.height = self._width
 		else:
 			raise ValueError('Invalid rotation value')
+		print("Display is now: {} x {}", self.width, self.height)
 
 	def draw_line(self, x0, y0, x1, y1, colored):
 		# Bresenham algorithm

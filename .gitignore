@@ -1,1 +1,5 @@
 .DS_Store
+bitmapfont.py*
+font_to_bin.py*
+bitmapfont.mpy*
+font5x8.bin
