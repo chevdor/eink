@@ -28,10 +28,10 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 		return self._buffer[(x + y * self._width) // 8]
 		
 	def set_absolute_pixel(self, x, y, colored):
-		print("set_absolute_pixel", x, y, colored)
+		# print("set_absolute_pixel", x, y, colored)
 		# print(" A: w x h: ", self._width , self._height )
 		if (x < 0 or x >= self._width or y < 0 or y >= self._height):
-			print("A: skipped", x, y)
+			# print("A: skipped", x, y)
 			return
 		if (colored):
 			self._buffer[(x + y * self._width) // 8] &= ~(0x80 >> (x % 8))
@@ -51,10 +51,10 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 			return self.get_absolute_pixel(y, self.width -1 - x)
 
 	def set_pixel(self, x, y, colored):
-		print("set_pixel", x, y, colored)
+		# print("set_pixel", x, y, colored)
 		# print(" R: w x h:", self.width, self.height )
 		if (x < 0 or x >= self.width or y < 0 or y >= self.height):
-			print("R: skipped", x, y)
+			# print("R: skipped", x, y)
 			return
 		if (self._rotate == ROTATE_0):
 			self.set_absolute_pixel(x, y, colored)
@@ -87,7 +87,7 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 			self.height = self._width
 		else:
 			raise ValueError('Invalid rotation value')
-		print("Display is now: {} x {}", self.width, self.height)
+		# print("Display is now: {} x {}", self.width, self.height)
 
 	def draw_line(self, x0, y0, x1, y1, colored):
 		# Bresenham algorithm
