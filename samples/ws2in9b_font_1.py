@@ -25,11 +25,11 @@ def main(spi):
 	fb_black.set_rotate(FrameBufferExtended.ROTATE_270)
 	fb_red.set_rotate(FrameBufferExtended.ROTATE_270)
 	MSG = 'It Works!'
-	with BitmapFont(DISPLAY_WIDTH, DISPLAY_HEIGHT, fb_black.set_pixel) as bfb:	
-		with BitmapFont(DISPLAY_WIDTH, DISPLAY_HEIGHT, fb_red.set_pixel) as bfr:	
+	with BitmapFont(fb_black.width, fb_black.height, fb_black.set_pixel) as bfb:	
+		with BitmapFont(fb_red.width, fb_red.height, fb_red.set_pixel) as bfr:	
 			# message_width = bfb.width(MSG)   # Message width in pixels.
-			bfb.text("It Works!",0,0,1)   
-			bfr.text("Awesome, now we can have fun!",0,10,1)       
+			bfb.text("It Works!",1,0,1)   
+			bfr.text("Awesome, now we can have fun!",1,10,1)       
     
 			e.display_frame(buf_b, buf_r)
 
