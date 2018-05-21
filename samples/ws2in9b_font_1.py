@@ -97,15 +97,19 @@ def test5():
 	fb_red.fill(WHITE)
 	fb_black.set_rotate(FrameBufferExtended.ROTATE_270)
 	fb_red.set_rotate(FrameBufferExtended.ROTATE_270)
+	y = 0
 	with BitmapFont(fb_black.width, fb_black.height, fb_black.set_pixel) as bfb:	
 		with BitmapFont(fb_red.width, fb_red.height, fb_red.set_pixel) as bfr:	
-			bfb.text("ABCDEFGHIJKLMNOPQRSTUVWXYZ",1,0,1)   
-			bfr.text("abcdefghijklmnopqrstuvwxyz",1,10,1)       
-			bfb.text("0123456789.",1,20,1)       
+			bfr.text("Non Proportional font demo:",1,y,1); y += 8 + 1
+			bfb.text("ABCDEFGHIJKLMNOPQRSTUVWXYZ",1,y,1); y += 8 + 1   
+			bfb.text("abcdefghijklmnopqrstuvwxyz",1,y,1); y += 8 + 1       
+			bfb.text("0123456789.",1,y,1); y += 8 + 1
+			y += 8 + 1       
 			
-			bfr.text_proportional("ABCDEFGHIJKLMNOPQRSTUVWXYZ",1,30,1)   
-			bfb.text_proportional("abcdefghijklmnopqrstuvwxyz",1,40,1)       
-			bfr.text_proportional("0123456789.",1,50,1)       
+			bfr.text_proportional("Proportional font demo:",1,y,1); y += 8 + 1   
+			bfb.text_proportional("ABCDEFGHIJKLMNOPQRSTUVWXYZ",1,y,1); y += 8 + 1   
+			bfb.text_proportional("abcdefghijklmnopqrstuvwxyz",1,y,1); y += 8 + 1       
+			bfb.text_proportional("0123456789.",1,y,1); y += 8 + 1       
 	
 			e.display_frame(buf_b, buf_r)
 

@@ -1,5 +1,5 @@
 # MicroPython basic bitmap font renderer.
-# Author: Tony DiCola
+# Author: Tony DiCola & Wilfried Kopp
 # License: MIT License (https://opensource.org/licenses/MIT)
 import ustruct
 
@@ -87,7 +87,7 @@ class BitmapFont:
             pos += self.char_width(ch) + 1
 
     def text_width(self, text):
-        """ Return the pixel width of the specified text message """
+        """ Return the pixel width of the specified text message assuming non proportional font """
         return len(text) * (self._font_width + 1)
 
     def char_boundaries(self, ch):
