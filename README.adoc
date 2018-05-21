@@ -18,6 +18,7 @@ Many thanks to the authors of the following:
 I recommend using ampy: https://github.com/adafruit/ampy
 
 You will probably want to add the following to your `.bash_profile`:
+
 	echo "export AMPY_PORT=/dev/cu.SLAB_USBtoUART" >> ~/.bash_profile
 	echo "export AMPY_BAUD=115200" >> ~/.bash_profile
 	source ~/.bash_profile

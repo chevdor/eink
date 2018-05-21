@@ -16,3 +16,7 @@ image::doc/test1.jpg[width=300px]
 	h 296 
 
 image::doc/test2.jpg[width=300px]
+
+== Font and Rotation
+
+image::doc/font.jpg[width=600px]
