@@ -14,8 +14,10 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 		self._height = h
 		self.height = h
 		self._rotate = ROTATE_0
+		self.scale = 1
 
-		super(FrameBufferExtended, self).__init__(buf, w, h, enc)
+		super(FrameBufferExtended, self)
+		#super(FrameBufferExtended, self).__init__(buf, w, h, enc)
 
 	@property
 	def buffer(self):
@@ -24,19 +26,19 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 	def get_absolute_pixel(self, x, y):
 		if (x < 0 or x >= self._width or y < 0 or y >= self._height):
 			return
-		
-		return self._buffer[(x + y * self._width) // 8]
-		
+		return super(FrameBufferExtended,self).pixel(x,y)
+
+
 	def set_absolute_pixel(self, x, y, colored):
-		# print("set_absolute_pixel", x, y, colored)
-		# print(" A: w x h: ", self._width , self._height )
 		if (x < 0 or x >= self._width or y < 0 or y >= self._height):
-			# print("A: skipped", x, y)
 			return
-		if (colored):
-			self._buffer[(x + y * self._width) // 8] &= ~(0x80 >> (x % 8))
+		super(FrameBufferExtended,self).pixel(x,y,colored)
+
+	def set_scaled_pixel(self, x, y, colored):
+		if self.scale == 1:
+			self.set_absolute_pixel(x, y, colored)
 		else:
-			self._buffer[(x + y * self._width) // 8] |= 0x80 >> (x % 8)
+			super(FrameBufferExtended,self).fill_rect(x * self.scale,y * self.scale, self.scale, self.scale, colored)
 
 	def get_pixel(self, x, y):
 		if (x < 0 or x >= self.width or y < 0 or y >= self.height):
@@ -57,13 +59,13 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 			# print("R: skipped", x, y)
 			return
 		if (self._rotate == ROTATE_0):
-			self.set_absolute_pixel(x, y, colored)
+			self.set_scaled_pixel(x, y, colored)
 		elif (self._rotate == ROTATE_90):
-			self.set_absolute_pixel(self.height -y -1, x, colored)
+			self.set_scaled_pixel(self.height -y -1, x, colored)
 		elif (self._rotate == ROTATE_180):
-			self.set_absolute_pixel(self.width -1 - x, self.height -1 - y, colored)
+			self.set_scaled_pixel(self.width -1 - x, self.height -1 - y, colored)
 		elif (self._rotate == ROTATE_270):
-			self.set_absolute_pixel(y, self.width -1 - x, colored)
+			self.set_scaled_pixel(y, self.width -1 - x, colored)
 
 	def get_rotate(self):
 		return self._rotate
@@ -180,6 +182,9 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 				 err += x_pos * 2 + 1
 			if x_pos > 0:
 				 break
+	
+	def set_scale(self, scale):
+		self.scale = scale
 
 	def draw_string_at(self, x, y, text, font, colored):
 		image = Image.new('1', (self.width, self.height))
@@ -193,3 +198,16 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 				 # Set the bits for the column of pixels at the current position.
 				 if pixels[x, y] != 0:
 					  self.set_pixel(x, y, colored)
+
+	# pycom-micropython does not support framebuf.MVLSB
+	# This will fix the buffer. Unfortunately repeated calls doesnt work as expected. 
+	def fix_framebuffer_MVLSB(self):
+		for x in range(len(self._buffer)//2):
+			b = self._buffer[ x ]    
+			self._buffer[ x ] = self._buffer[len(self._buffer) -1 - x]
+			self._buffer[len(self._buffer) - 1 - x] = b    
+		for y in range(self.height // 8):
+			for x in range(self.width // 2):
+				b = self._buffer[ (y * self.width) + x ]    
+				self._buffer[ y * self.width + x ] =  self._buffer[ y * self.width + self.width - 1 - x ]
+				self._buffer[ y * self.width + self.width - 1 - x ] = b    
