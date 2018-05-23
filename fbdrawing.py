@@ -7,7 +7,7 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 	ROTATE_180 = const(2)
 	ROTATE_270 = const(3)
 
-	def __init__(self, buf, w, h, enc):
+    def __init__(self, buf, w, h, enc):
 		self._buffer = buf
 		self._width = w # 'physical' width
 		self.width = w # processing width
@@ -16,29 +16,37 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 		self._rotate = ROTATE_0
 		self.scale = 1
 
-		super(FrameBufferExtended, self)
-		#super(FrameBufferExtended, self).__init__(buf, w, h, enc)
+		#super(FrameBufferExtended, self)
+		super(FrameBufferExtended, self).__init__(buf, w, h, enc)
 
 	@property
 	def buffer(self):
 		return self._buffer
 
-	def get_absolute_pixel(self, x, y):
-		if (x < 0 or x >= self._width or y < 0 or y >= self._height):
-			return
-		return super(FrameBufferExtended,self).pixel(x,y)
+    def get_absolute_pixel(self, x, y):
+        if (x < 0 or x >= self._width or y < 0 or y >= self._height):
+            return
 
+        return self._buffer[(x + y * self._width) // 8]
 
-	def set_absolute_pixel(self, x, y, colored):
-		if (x < 0 or x >= self._width or y < 0 or y >= self._height):
-			return
-		super(FrameBufferExtended,self).pixel(x,y,colored)
+    def set_absolute_pixel(self, x, y, colored):
+        # print("set_absolute_pixel", x, y, colored)
+        # print(" A: w x h: ", self._width , self._height )
+        if (x < 0 or x >= self._width or y < 0 or y >= self._height):
+            # print("A: skipped", x, y)
+            return
+        if (colored):
+            self._buffer[(x + y * self._width) // 8] &= ~(0x80 >> (x % 8))
+        else:
+            self._buffer[(x + y * self._width) // 8] |= 0x80 >> (x % 8)
 
 	def set_scaled_pixel(self, x, y, colored):
 		if self.scale == 1:
 			self.set_absolute_pixel(x, y, colored)
 		else:
-			super(FrameBufferExtended,self).fill_rect(x * self.scale,y * self.scale, self.scale, self.scale, colored)
+			xoffset = x * self.scale
+			yoffset = y * self.scale
+			self.draw_filled_rectangle(xoffset, yoffset, xoffset + self.scale, yoffset + self.scale, colored)
 
 	def get_pixel(self, x, y):
 		if (x < 0 or x >= self.width or y < 0 or y >= self.height):
