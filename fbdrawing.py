@@ -7,7 +7,7 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 	ROTATE_180 = const(2)
 	ROTATE_270 = const(3)
 
-    def __init__(self, buf, w, h, enc):
+	def __init__(self, buf, w, h, enc):
 		self._buffer = buf
 		self._width = w # 'physical' width
 		self.width = w # processing width
@@ -15,7 +15,9 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 		self.height = h
 		self._rotate = ROTATE_0
 		self.scale = 1
-
+		# super(FrameBufferExtended, self).__init__(buf, w, h, enc) 
+		# crashes on the Lopy
+		# swap with the following line
 		#super(FrameBufferExtended, self)
 		super(FrameBufferExtended, self).__init__(buf, w, h, enc)
 
@@ -23,22 +25,21 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 	def buffer(self):
 		return self._buffer
 
-    def get_absolute_pixel(self, x, y):
-        if (x < 0 or x >= self._width or y < 0 or y >= self._height):
-            return
+	def get_absolute_pixel(self, x, y):
+		if (x < 0 or x >= self._width or y < 0 or y >= self._height):
+			return
+		return (self._buffer[(x + y * self._width) // 8] >> (7 - (x % 8))) & 1
 
-        return self._buffer[(x + y * self._width) // 8]
-
-    def set_absolute_pixel(self, x, y, colored):
-        # print("set_absolute_pixel", x, y, colored)
-        # print(" A: w x h: ", self._width , self._height )
-        if (x < 0 or x >= self._width or y < 0 or y >= self._height):
-            # print("A: skipped", x, y)
-            return
-        if (colored):
-            self._buffer[(x + y * self._width) // 8] &= ~(0x80 >> (x % 8))
-        else:
-            self._buffer[(x + y * self._width) // 8] |= 0x80 >> (x % 8)
+	def set_absolute_pixel(self, x, y, colored):
+		# print("set_absolute_pixel", x, y, colored)
+		# print(" A: w x h: ", self._width , self._height )
+		if (x < 0 or x >= self._width or y < 0 or y >= self._height):
+			# print("A: skipped", x, y)
+			return
+		if (colored):
+			self._buffer[(x + y * self._width) // 8] &= ~(0x80 >> (x % 8))
+		else:
+			self._buffer[(x + y * self._width) // 8] |= 0x80 >> (x % 8)
 
 	def set_scaled_pixel(self, x, y, colored):
 		if self.scale == 1:
@@ -46,7 +47,9 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 		else:
 			xoffset = x * self.scale
 			yoffset = y * self.scale
-			self.draw_filled_rectangle(xoffset, yoffset, xoffset + self.scale, yoffset + self.scale, colored)
+			for px in range(self.scale):
+				for py in range(self.scale):
+					self.set_absolute_pixel(xoffset + px, yoffset + py, colored)
 
 	def get_pixel(self, x, y):
 		if (x < 0 or x >= self.width or y < 0 or y >= self.height):
@@ -140,6 +143,17 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 		max_y = y1 if y1 > y0 else y0
 		for i in range(min_x, max_x + 1):
 			self.draw_vertical_line(i, min_y, max_y - min_y + 1, colored)
+	
+	def scroll(self, x, y):
+		if x > 0:
+			print("Scrolling x-axis not implemented")
+		linebytes = abs(y * self.scale) * self.width //8
+		if linebytes > len(self._buffer):
+			linebytes = len(self._buffer)
+		if y > 0:
+			self._buffer[0 : len(self._buffer) - linebytes ] = self._buffer[ linebytes :  ] 
+		else:
+			self._buffer[ linebytes : len(self._buffer) ] = self._buffer[0: len(self._buffer) - linebytes ] 
 
 	def draw_circle(self, x, y, radius, colored):
 		# Bresenham algorithm
@@ -207,15 +221,3 @@ class FrameBufferExtended(framebuf.FrameBuffer):
 				 if pixels[x, y] != 0:
 					  self.set_pixel(x, y, colored)
 
-	# pycom-micropython does not support framebuf.MVLSB
-	# This will fix the buffer. Unfortunately repeated calls doesnt work as expected. 
-	def fix_framebuffer_MVLSB(self):
-		for x in range(len(self._buffer)//2):
-			b = self._buffer[ x ]    
-			self._buffer[ x ] = self._buffer[len(self._buffer) -1 - x]
-			self._buffer[len(self._buffer) - 1 - x] = b    
-		for y in range(self.height // 8):
-			for x in range(self.width // 2):
-				b = self._buffer[ (y * self.width) + x ]    
-				self._buffer[ y * self.width + x ] =  self._buffer[ y * self.width + self.width - 1 - x ]
-				self._buffer[ y * self.width + self.width - 1 - x ] = b    

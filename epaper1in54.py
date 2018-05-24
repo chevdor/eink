@@ -72,8 +72,8 @@ class EPD:
         self._command(WRITE_VCOM_REGISTER, b'\xA8') # VCOM 7C
         self._command(SET_DUMMY_LINE_PERIOD, b'\x1A') # 4 dummy lines per gate
         self._command(SET_GATE_TIME, b'\x08') # 2us per line
-        #self._command(DATA_ENTRY_MODE_SETTING, b'\x03') # X increment Y increment
-        self._command(DATA_ENTRY_MODE_SETTING, b'\x07') # X increment Y increment
+        self._command(DATA_ENTRY_MODE_SETTING, b'\x03') # X increment Y increment
+        #self._command(DATA_ENTRY_MODE_SETTING, b'\x07') # X increment Y increment
         self.set_lut(self.LUT_FULL_UPDATE)
 
     def wait_until_idle(self):
